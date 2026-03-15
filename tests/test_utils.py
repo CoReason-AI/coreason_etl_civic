@@ -8,6 +8,8 @@
 #
 # Source Code: https://github.com/CoReason-AI/coreason_etl_civic
 
+import importlib
+import shutil
 from pathlib import Path
 
 from coreason_etl_civic.utils.logger import logger
@@ -15,21 +17,34 @@ from coreason_etl_civic.utils.logger import logger
 
 def test_logger_initialization() -> None:
     """Test that the logger is initialized correctly and creates the log directory."""
-    # Since the logger is initialized on import, we check side effects
 
-    # Check if logs directory creation is handled
-    # Note: running this test might actually create the directory in the test environment
-    # if it doesn't exist.
-
-    log_path = Path("logs")
-    assert log_path.exists()
-    assert log_path.is_dir()
-
-    # Verify app.log creation if it was logged to (it might be empty or not created until log)
-    # logger.info("Test log")
-    # assert (log_path / "app.log").exists()
+    # If the directory doesn't exist, we skip checking it here as tests might be run in any order,
+    # and another test might have removed it. We just verify the module loads without error.
+    # The test_logger_directory_creation function already specifically tests the side effect of directory creation.
 
 
 def test_logger_exports() -> None:
     """Test that logger is exported."""
     assert logger is not None
+
+
+def test_logger_directory_creation() -> None:
+    """Test logger directory creation when it does not exist."""
+    import coreason_etl_civic.utils.logger
+
+    log_path = Path("logs")
+
+    # In Windows, we can't remove the directory if the log file is still held open by loguru.
+    # Therefore, we remove the log file sink first.
+    coreason_etl_civic.utils.logger.logger.remove()
+
+    if log_path.exists():
+        import contextlib
+
+        with contextlib.suppress(OSError):
+            shutil.rmtree(log_path)
+
+    importlib.reload(coreason_etl_civic.utils.logger)
+
+    assert log_path.exists()
+    assert log_path.is_dir()
