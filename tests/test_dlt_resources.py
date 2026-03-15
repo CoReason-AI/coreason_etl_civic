@@ -22,7 +22,7 @@ from coreason_etl_civic.dlt_resources import (
 @mock.patch("coreason_etl_civic.dlt_resources.process_civic_tsv")
 def test_get_civic_genes_resource(mock_process: mock.MagicMock, mock_fetch: mock.MagicMock) -> None:
     """AGENT INSTRUCTION: Ensure the genes resource integrates correctly."""
-    mock_fetch.return_value = [b"gene_id\tname\n", b"1\tBRAF"]
+    mock_fetch.return_value = iter([b"gene_id\tname\n", b"1\tBRAF"])
     mock_process.return_value = [{"coreason_id": "uuid", "raw_data": {}}]
 
     results = list(get_civic_genes())
@@ -30,7 +30,7 @@ def test_get_civic_genes_resource(mock_process: mock.MagicMock, mock_fetch: mock
     assert len(results) == 1
     mock_fetch.assert_called_once()
     mock_process.assert_called_once_with(
-        b"gene_id\tname\n1\tBRAF", "genes", "gene_id", source_file="nightly-GeneSummaries.tsv"
+        mock_fetch.return_value, "genes", "gene_id", source_file="nightly-GeneSummaries.tsv"
     )
 
 
@@ -38,21 +38,23 @@ def test_get_civic_genes_resource(mock_process: mock.MagicMock, mock_fetch: mock
 @mock.patch("coreason_etl_civic.dlt_resources.process_civic_tsv")
 def test_get_civic_variants_resource(mock_process: mock.MagicMock, mock_fetch: mock.MagicMock) -> None:
     """AGENT INSTRUCTION: Ensure the variants resource integrates correctly."""
-    mock_fetch.return_value = [b"chunk"]
+    mock_fetch.return_value = iter([b"chunk"])
     mock_process.return_value = [{"coreason_id": "uuid", "raw_data": {}}]
 
     results = list(get_civic_variants())
 
     assert len(results) == 1
     mock_fetch.assert_called_once()
-    mock_process.assert_called_once_with(b"chunk", "variants", "variant_id", source_file="nightly-VariantSummaries.tsv")
+    mock_process.assert_called_once_with(
+        mock_fetch.return_value, "variants", "variant_id", source_file="nightly-VariantSummaries.tsv"
+    )
 
 
 @mock.patch("coreason_etl_civic.dlt_resources.fetch_civic_tsv")
 @mock.patch("coreason_etl_civic.dlt_resources.process_civic_tsv")
 def test_get_civic_evidence_resource(mock_process: mock.MagicMock, mock_fetch: mock.MagicMock) -> None:
     """AGENT INSTRUCTION: Ensure the evidence resource integrates correctly."""
-    mock_fetch.return_value = [b"chunk"]
+    mock_fetch.return_value = iter([b"chunk"])
     mock_process.return_value = [{"coreason_id": "uuid", "raw_data": {}}]
 
     results = list(get_civic_evidence())
@@ -60,7 +62,7 @@ def test_get_civic_evidence_resource(mock_process: mock.MagicMock, mock_fetch: m
     assert len(results) == 1
     mock_fetch.assert_called_once()
     mock_process.assert_called_once_with(
-        b"chunk", "evidence", "evidence_id", source_file="nightly-ClinicalEvidenceSummaries.tsv"
+        mock_fetch.return_value, "evidence", "evidence_id", source_file="nightly-ClinicalEvidenceSummaries.tsv"
     )
 
 
@@ -68,7 +70,7 @@ def test_get_civic_evidence_resource(mock_process: mock.MagicMock, mock_fetch: m
 @mock.patch("coreason_etl_civic.dlt_resources.process_civic_tsv")
 def test_fetch_and_process_integration(mock_process: mock.MagicMock, mock_fetch: mock.MagicMock) -> None:
     """AGENT INSTRUCTION: Test the helper function buffering logic."""
-    mock_fetch.return_value = [b"gene_id\tname\n", b"1\tBRAF"]
+    mock_fetch.return_value = iter([b"gene_id\tname\n", b"1\tBRAF"])
     mock_process.return_value = [{"coreason_id": "uuid", "raw_data": {"gene_id": "1", "name": "BRAF"}}]
 
     results = list(_fetch_and_process("http://fake.url", "genes", "gene_id", "nightly-GeneSummaries.tsv"))
@@ -76,5 +78,5 @@ def test_fetch_and_process_integration(mock_process: mock.MagicMock, mock_fetch:
     assert len(results) == 1
     mock_fetch.assert_called_once_with("http://fake.url")
     mock_process.assert_called_once_with(
-        b"gene_id\tname\n1\tBRAF", "genes", "gene_id", source_file="nightly-GeneSummaries.tsv"
+        mock_fetch.return_value, "genes", "gene_id", source_file="nightly-GeneSummaries.tsv"
     )
