@@ -4,7 +4,9 @@ WITH raw AS (
     SELECT
         coreason_id,
         raw_data,
-        md5(raw_data::text) AS content_hash
+        ingestion_ts,
+        md5(raw_data::text) AS content_hash,
+        ROW_NUMBER() OVER (PARTITION BY (raw_data->>'evidence_id')::integer ORDER BY ingestion_ts DESC) AS rn
     FROM {{ source('bronze', 'civic_evidence_raw') }}
 )
 SELECT
@@ -20,3 +22,4 @@ SELECT
     NULLIF(TRIM(raw_data->>'rating'), '')::integer AS evidence_rating,
     NULLIF(TRIM(raw_data->>'pubmed_id'), '') AS pubmed_id
 FROM raw
+WHERE rn = 1
