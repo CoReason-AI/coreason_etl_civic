@@ -20,9 +20,8 @@ from coreason_etl_civic.utils.polars_processor import process_civic_tsv
 
 def _fetch_and_process(url: str, entity_type: str, source_id_col: str, source_file: str) -> Iterator[dict[str, Any]]:
     # Download TSV chunks
-    # Since process_civic_tsv takes bytes directly, we buffer the whole file.
-    # The TSV isn't large, but if it was, a BytesIO approach would be ideal.
-    chunks = b"".join(fetch_civic_tsv(url))
+    # Pass the generator directly to process_civic_tsv so it processes them in batches
+    chunks = fetch_civic_tsv(url)
     yield from process_civic_tsv(chunks, entity_type, source_id_col, source_file=source_file)
 
 
