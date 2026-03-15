@@ -12,8 +12,14 @@ authors = [
     { name = "Akshaya M", email = "akshaya.movvar@coreason.ai" },
 ]
 dependencies = [
+    "dbt-core>=1.11.7",
+    "dbt-postgres>=1.10.0",
+    "dlt>=1.23.0",
     "loguru>=0.7.2",
+    "polars>=1.39.0",
+    "psycopg2-binary>=2.9.11",
     "pydantic-settings>=2.13.1",
+    "requests>=2.32.5",
 ]
 license = { file = "LICENSE" }
 classifiers = [
@@ -38,7 +44,8 @@ dev = [
     "mkdocstrings-python",
     "types-pyyaml>=6.0.12.20250915",
     "tzdata>=2025.3",
-    "pytest-xdist>=3.6.1"
+    "pytest-xdist>=3.6.1",
+    "types-requests>=2.32.4.20260107",
 ]
 
 [tool.hatch.build.targets.wheel]
