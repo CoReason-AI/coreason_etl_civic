@@ -43,3 +43,23 @@ def test_process_civic_tsv_empty_values() -> None:
         "coreason_id": expected_coreason_id,
         "raw_data": {"evidence_id": "789", "variant_id": None},
     }
+
+
+def test_process_civic_tsv_with_source_file() -> None:
+    """AGENT INSTRUCTION: Ensure process_civic_tsv adds source_file and ingestion_ts if source_file is provided."""
+    tsv_content = b"evidence_id\tvariant_id\n123\t456\n"
+    entity_type = "evidence"
+    source_id_col = "evidence_id"
+    source_file = "nightly-ClinicalEvidenceSummaries.tsv"
+
+    results = list(process_civic_tsv(tsv_content, entity_type, source_id_col, source_file))
+
+    assert len(results) == 1
+    expected_coreason_id = str(generate_coreason_id("123"))
+
+    assert "source_file" in results[0]
+    assert results[0]["source_file"] == source_file
+    assert "ingestion_ts" in results[0]
+
+    assert results[0]["coreason_id"] == expected_coreason_id
+    assert results[0]["raw_data"] == {"evidence_id": "123", "variant_id": "456"}
