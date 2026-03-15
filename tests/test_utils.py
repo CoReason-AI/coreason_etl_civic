@@ -9,6 +9,7 @@
 # Source Code: https://github.com/CoReason-AI/coreason_etl_civic
 
 import importlib
+import shutil
 from pathlib import Path
 
 from coreason_etl_civic.utils.logger import logger
@@ -32,15 +33,19 @@ def test_logger_exports() -> None:
 
 def test_logger_directory_creation() -> None:
     """Test logger directory creation when it does not exist."""
-    import importlib
-    import shutil
-    from pathlib import Path
-
     import coreason_etl_civic.utils.logger
 
     log_path = Path("logs")
+
+    # In Windows, we can't remove the directory if the log file is still held open by loguru.
+    # Therefore, we remove the log file sink first.
+    coreason_etl_civic.utils.logger.logger.remove()
+
     if log_path.exists():
-        shutil.rmtree(log_path)
+        import contextlib
+
+        with contextlib.suppress(OSError):
+            shutil.rmtree(log_path)
 
     importlib.reload(coreason_etl_civic.utils.logger)
 
