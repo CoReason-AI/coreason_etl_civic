@@ -45,6 +45,22 @@ def test_process_civic_tsv_empty_values() -> None:
     }
 
 
+def test_process_civic_tsv_na_values() -> None:
+    """AGENT INSTRUCTION: Ensure TSV handles 'N/A' string representation correctly as null."""
+    tsv_content = b"evidence_id\tvariant_id\tclinical_significance\n789\t\tN/A\n"
+    entity_type = "evidence"
+    source_id_col = "evidence_id"
+
+    results = list(process_civic_tsv(tsv_content, entity_type, source_id_col))
+
+    assert len(results) == 1
+    expected_coreason_id = str(generate_coreason_id("789"))
+    assert results[0] == {
+        "coreason_id": expected_coreason_id,
+        "raw_data": {"evidence_id": "789", "variant_id": None, "clinical_significance": None},
+    }
+
+
 def test_process_civic_tsv_with_source_file() -> None:
     """AGENT INSTRUCTION: Ensure process_civic_tsv adds source_file and ingestion_ts if source_file is provided."""
     tsv_content = b"evidence_id\tvariant_id\n123\t456\n"
