@@ -4,7 +4,9 @@ WITH raw AS (
     SELECT
         coreason_id,
         raw_data,
-        md5(raw_data::text) AS content_hash
+        ingestion_ts,
+        md5(raw_data::text) AS content_hash,
+        ROW_NUMBER() OVER (PARTITION BY (raw_data->>'variant_id')::integer ORDER BY ingestion_ts DESC) AS rn
     FROM {{ source('bronze', 'civic_variants_raw') }}
 )
 SELECT
@@ -15,3 +17,4 @@ SELECT
     raw_data->>'name' AS variant_name,
     raw_data->>'summary' AS summary
 FROM raw
+WHERE rn = 1

@@ -11,6 +11,7 @@
 from unittest import mock
 
 from coreason_etl_civic.dlt_resources import (
+    _fetch_and_process,
     get_civic_evidence,
     get_civic_genes,
     get_civic_variants,
@@ -28,7 +29,9 @@ def test_get_civic_genes_resource(mock_process: mock.MagicMock, mock_fetch: mock
 
     assert len(results) == 1
     mock_fetch.assert_called_once()
-    mock_process.assert_called_once_with(b"gene_id\tname\n1\tBRAF", "genes", "gene_id")
+    mock_process.assert_called_once_with(
+        b"gene_id\tname\n1\tBRAF", "genes", "gene_id", source_file="nightly-GeneSummaries.tsv"
+    )
 
 
 @mock.patch("coreason_etl_civic.dlt_resources.fetch_civic_tsv")
@@ -42,7 +45,7 @@ def test_get_civic_variants_resource(mock_process: mock.MagicMock, mock_fetch: m
 
     assert len(results) == 1
     mock_fetch.assert_called_once()
-    mock_process.assert_called_once_with(b"chunk", "variants", "variant_id")
+    mock_process.assert_called_once_with(b"chunk", "variants", "variant_id", source_file="nightly-VariantSummaries.tsv")
 
 
 @mock.patch("coreason_etl_civic.dlt_resources.fetch_civic_tsv")
@@ -56,4 +59,22 @@ def test_get_civic_evidence_resource(mock_process: mock.MagicMock, mock_fetch: m
 
     assert len(results) == 1
     mock_fetch.assert_called_once()
-    mock_process.assert_called_once_with(b"chunk", "evidence", "evidence_id")
+    mock_process.assert_called_once_with(
+        b"chunk", "evidence", "evidence_id", source_file="nightly-ClinicalEvidenceSummaries.tsv"
+    )
+
+
+@mock.patch("coreason_etl_civic.dlt_resources.fetch_civic_tsv")
+@mock.patch("coreason_etl_civic.dlt_resources.process_civic_tsv")
+def test_fetch_and_process_integration(mock_process: mock.MagicMock, mock_fetch: mock.MagicMock) -> None:
+    """AGENT INSTRUCTION: Test the helper function buffering logic."""
+    mock_fetch.return_value = [b"gene_id\tname\n", b"1\tBRAF"]
+    mock_process.return_value = [{"coreason_id": "uuid", "raw_data": {"gene_id": "1", "name": "BRAF"}}]
+
+    results = list(_fetch_and_process("http://fake.url", "genes", "gene_id", "nightly-GeneSummaries.tsv"))
+
+    assert len(results) == 1
+    mock_fetch.assert_called_once_with("http://fake.url")
+    mock_process.assert_called_once_with(
+        b"gene_id\tname\n1\tBRAF", "genes", "gene_id", source_file="nightly-GeneSummaries.tsv"
+    )
