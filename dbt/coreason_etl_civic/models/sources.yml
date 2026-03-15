@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: bronze
+    description: "Raw DLT ingested data from CIViC"
+    tables:
+      - name: civic_genes_raw
+      - name: civic_variants_raw
+      - name: civic_evidence_raw
