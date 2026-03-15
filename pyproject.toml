@@ -12,8 +12,12 @@ authors = [
     { name = "Akshaya M", email = "akshaya.movvar@coreason.ai" },
 ]
 dependencies = [
+    "dlt>=1.23.0",
     "loguru>=0.7.2",
+    "polars>=1.39.0",
+    "psycopg-binary>=3.3.3",
     "pydantic-settings>=2.13.1",
+    "requests>=2.32.5",
 ]
 license = { file = "LICENSE" }
 classifiers = [
@@ -38,7 +42,8 @@ dev = [
     "mkdocstrings-python",
     "types-pyyaml>=6.0.12.20250915",
     "tzdata>=2025.3",
-    "pytest-xdist>=3.6.1"
+    "pytest-xdist>=3.6.1",
+    "types-requests>=2.32.4.20260107",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -67,6 +72,13 @@ disallow_untyped_defs = true
 warn_unused_ignores = true
 plugins = ["pydantic.mypy"]
 
+[[tool.mypy.overrides]]
+module = [
+    "dlt.*",
+]
+ignore_missing_imports = true
+disallow_untyped_decorators = false
+
 [tool.pytest.ini_options]
 addopts = "-n auto --cov=src --cov-report=term-missing --cov-report=html --cov-fail-under=100"
 testpaths = ["tests"]
@@ -74,3 +86,6 @@ asyncio_mode = "auto"
 
 [tool.coverage.run]
 omit = ["tests/*"]
+
+[tool.deptry.per_rule_ignores]
+DEP002 = ["psycopg-binary"]

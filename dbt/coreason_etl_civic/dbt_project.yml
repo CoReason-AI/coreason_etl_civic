@@ -1,0 +1,19 @@
+name: 'coreason_etl_civic'
+version: '1.0.0'
+config-version: 2
+
+profile: 'coreason_etl_civic'
+
+model-paths: ["models"]
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  coreason_etl_civic:
+    +materialized: table
+    silver:
+      +schema: silver
+    gold:
+      +schema: gold
