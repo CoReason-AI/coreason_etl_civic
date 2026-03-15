@@ -80,6 +80,7 @@ def test_process_civic_tsv_with_source_file() -> None:
     assert results[0]["coreason_id"] == expected_coreason_id
     assert results[0]["raw_data"] == {"evidence_id": "123", "variant_id": "456"}
 
+
 def test_process_civic_tsv_empty_batch() -> None:
     """AGENT INSTRUCTION: Ensure empty lines or empty batches are handled."""
     tsv_content = iter([b"evidence_id\tvariant_id\n"])
@@ -88,6 +89,7 @@ def test_process_civic_tsv_empty_batch() -> None:
 
     results = list(process_civic_tsv(tsv_content, entity_type, source_id_col))
     assert len(results) == 0
+
 
 def test_process_civic_tsv_no_newline() -> None:
     """AGENT INSTRUCTION: Ensure files ending with no newline process correctly."""
@@ -98,6 +100,7 @@ def test_process_civic_tsv_no_newline() -> None:
     results = list(process_civic_tsv(tsv_content, entity_type, source_id_col))
     assert len(results) == 1
     assert results[0]["raw_data"] == {"evidence_id": "123", "variant_id": "456"}
+
 
 def test_process_civic_tsv_whitespace_only_batch() -> None:
     """AGENT INSTRUCTION: Ensure batches containing only whitespace yield nothing."""
@@ -110,14 +113,13 @@ def test_process_civic_tsv_whitespace_only_batch() -> None:
     results = list(process_civic_tsv(tsv_content, entity_type, source_id_col))
     assert len(results) == 0
 
+
 def test_process_civic_tsv_multiple_batches() -> None:
     """AGENT INSTRUCTION: Ensure batch limit chunking works properly."""
     # yield partially broken lines as chunks to trigger leftover logic
-    tsv_content = iter([
-        b"evidence_id\tvariant_id\n",
-        b"0\t0\n",
-        b"1\t", b"1\n"
-    ] + [f"{i}\t{i}\n".encode() for i in range(2, 1005)])
+    tsv_content = iter(
+        [b"evidence_id\tvariant_id\n", b"0\t0\n", b"1\t", b"1\n"] + [f"{i}\t{i}\n".encode() for i in range(2, 1005)]
+    )
 
     entity_type = "evidence"
     source_id_col = "evidence_id"
@@ -127,6 +129,7 @@ def test_process_civic_tsv_multiple_batches() -> None:
     assert len(results) == 1005
     assert results[0]["raw_data"] == {"evidence_id": "0", "variant_id": "0"}
     assert results[-1]["raw_data"] == {"evidence_id": "1004", "variant_id": "1004"}
+
 
 def test_process_civic_tsv_empty_bytes() -> None:
     """AGENT INSTRUCTION: Ensure empty batch yields nothing."""
