@@ -31,7 +31,7 @@ def process_civic_tsv(
     ingestion_ts = datetime.now(tz=UTC).isoformat()
 
     # Load TSV from bytes
-    df = pl.read_csv(file_stream, separator="\t", infer_schema_length=0, null_values=[""])
+    df = pl.read_csv(file_stream, separator="\t", infer_schema_length=0, null_values=["", "N/A"])
 
     # Determine unique IDs for mapping using map_batches
     df = df.with_columns(
