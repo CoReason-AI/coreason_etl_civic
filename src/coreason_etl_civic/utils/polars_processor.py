@@ -24,29 +24,33 @@ def process_civic_tsv(
     """
     AGENT INSTRUCTION: Process raw CIViC TSV content using Polars.
     Expects an iterator of bytes representing lines or chunks.
-    Processes them in batches using Polars read_csv.
+    Processes them in batches using Polars read_csv. Lines are buffered by the newline
+    character to guarantee atomic rows and prevent data splitting mid-way across batches.
+    Any un-terminated bytes are preserved as leftover and prefixed to subsequent chunks.
+    Empty payloads or sequences containing only whitespace are explicitly bypassed.
     Generates UUIDs and wraps the output into the raw_data payload.
     Adds source_file and ingestion_ts to the output if source_file is provided.
     """
     logger.info("Processing CIViC TSV using Polars", entity_type=entity_type)
     ingestion_ts = datetime.now(tz=UTC).isoformat()
 
-    # Buffer lines to process in batches
-    # We buffer by lines to ensure we don't split rows mid-way when sending to pl.read_csv
     batch_size = 1000
     lines_buffer: list[bytes] = []
     header: bytes | None = None
 
     def _process_batch(batch_lines: list[bytes]) -> Iterator[dict[str, Any]]:
-        # Join lines into a single bytes payload for Polars
+        """
+        AGENT INSTRUCTION: Transmute the batched list of raw byte-lines into parsed payload representations.
+        Validates payload length, decodes TSV schemas utilizing Polars read_csv, and synthesizes immutable
+        UUID deterministic identity anchors (coreason_id) using parallel map_batches.
+        Converts final frames into explicit Bronze mapping topologies.
+        """
         batch_bytes = b"".join(batch_lines)
         if not batch_bytes.strip():
             return
 
-        # Load TSV from bytes batch
         df = pl.read_csv(batch_bytes, separator="\t", infer_schema_length=0, null_values=["", "N/A"])
 
-        # Determine unique IDs for mapping using map_batches
         df = df.with_columns(
             pl.col(source_id_col)
             .cast(pl.Utf8)
@@ -57,7 +61,6 @@ def process_civic_tsv(
             .alias("coreason_id")
         )
 
-        # Convert to dictionaries
         records = df.to_dicts()
 
         for row in records:
@@ -71,14 +74,11 @@ def process_civic_tsv(
                 record["ingestion_ts"] = ingestion_ts
             yield record
 
-    # Process chunks line by line to build valid CSV batches
     leftover = b""
     for chunk in file_stream:
-        # Split by newlines, preserving the newline character
         data = leftover + chunk
         lines = data.splitlines(keepends=True)
 
-        # If the last line doesn't end with a newline, it's incomplete
         leftover = (lines.pop() if lines else b"") if not data.endswith(b"\n") and not data.endswith(b"\r") else b""
 
         for line in lines:
@@ -89,14 +89,11 @@ def process_civic_tsv(
             lines_buffer.append(line)
 
             if len(lines_buffer) >= batch_size:
-                # Include header in every batch
                 yield from _process_batch([header, *lines_buffer])
                 lines_buffer.clear()
 
-    # Process any remaining leftover as a final line if present
     if leftover:
         lines_buffer.append(leftover)
 
-    # Process the final batch
     if lines_buffer and header is not None:
         yield from _process_batch([header, *lines_buffer])
