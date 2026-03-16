@@ -64,7 +64,7 @@ def test_run_pipeline(
         mock.ANY,
         mock_pipeline.destination_client.return_value.config,
         mock_pipeline.working_dir,
-        package_location="dbt/coreason_etl_civic"
+        package_location="dbt/coreason_etl_civic",
     )
 
     mock_runner = mock_create_runner.return_value
