@@ -31,8 +31,10 @@ def run_pipeline() -> None:
         dataset_name="bronze",
     )
 
-    # Note: dlt handles max_table_nesting=0 internally if configured via config.toml.
-    # We explicitly inject max_table_nesting at the resource execution layer to ensure JSONB behavior.
+    """
+    Note: dlt handles max_table_nesting=0 internally if configured via config.toml.
+    We explicitly inject max_table_nesting at the resource execution layer to ensure JSONB behavior.
+    """
     genes = get_civic_genes()
     genes.max_table_nesting = 0
 

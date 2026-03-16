@@ -19,8 +19,10 @@ from coreason_etl_civic.utils.polars_processor import process_civic_tsv
 
 
 def _fetch_and_process(url: str, entity_type: str, source_id_col: str, source_file: str) -> Iterator[dict[str, Any]]:
-    # Download TSV chunks
-    # Pass the generator directly to process_civic_tsv so it processes them in batches
+    """
+    Download TSV chunks.
+    Pass the generator directly to process_civic_tsv so it processes them in batches.
+    """
     chunks = fetch_civic_tsv(url)
     yield from process_civic_tsv(chunks, entity_type, source_id_col, source_file=source_file)
 
