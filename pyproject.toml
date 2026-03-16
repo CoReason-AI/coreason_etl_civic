@@ -89,3 +89,4 @@ omit = ["tests/*"]
 
 [tool.deptry.per_rule_ignores]
 DEP002 = ["psycopg-binary"]
+DEP003 = ["pydantic", "coreason_etl_civic"]

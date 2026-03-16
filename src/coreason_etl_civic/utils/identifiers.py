@@ -10,7 +10,7 @@
 
 import uuid
 
-# AGENT INSTRUCTION: The CIViC namespace must be a deterministic constant UUID.
+"""AGENT INSTRUCTION: The CIViC namespace must be a deterministic constant UUID."""
 NAMESPACE_CIVIC = uuid.UUID("3696f5b2-320c-4034-934c-619da0e7dc20")
 
 
