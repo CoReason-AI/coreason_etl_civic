@@ -17,7 +17,10 @@ from coreason_etl_civic.utils.http_client import fetch_civic_tsv
 
 
 def test_fetch_civic_tsv_success() -> None:
-    """AGENT INSTRUCTION: Ensure fetching TSV yields expected chunks correctly."""
+    """
+    AGENT INSTRUCTION: Ensure fetching TSV yields expected chunks correctly.
+    Mock context manager is used for requests.get.
+    """
     url = "https://example.com/file.tsv"
     expected_chunks = [b"chunk1", b"chunk2"]
 
@@ -26,7 +29,6 @@ def test_fetch_civic_tsv_success() -> None:
     mock_response.raise_for_status.return_value = None
 
     with mock.patch("requests.get", return_value=mock_response) as mock_get:
-        # Mock context manager
         mock_response.__enter__.return_value = mock_response
 
         chunks = list(fetch_civic_tsv(url))
