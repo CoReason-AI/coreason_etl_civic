@@ -103,9 +103,11 @@ def test_process_civic_tsv_no_newline() -> None:
 
 
 def test_process_civic_tsv_whitespace_only_batch() -> None:
-    """AGENT INSTRUCTION: Ensure batches containing only whitespace yield nothing."""
-    # Polars treats '   ' as a valid column value for 'evidence_id' if not empty.
-    # To test the `not batch_bytes.strip()` case, we just feed an empty line or entirely spaces.
+    """
+    AGENT INSTRUCTION: Ensure batches containing only whitespace yield nothing.
+    Polars treats '   ' as a valid column value for 'evidence_id' if not empty.
+    To test the `not batch_bytes.strip()` case, we just feed an empty line or entirely spaces.
+    """
     tsv_content = iter([b"   \n", b"   "])
     entity_type = "evidence"
     source_id_col = "evidence_id"
@@ -115,8 +117,10 @@ def test_process_civic_tsv_whitespace_only_batch() -> None:
 
 
 def test_process_civic_tsv_multiple_batches() -> None:
-    """AGENT INSTRUCTION: Ensure batch limit chunking works properly."""
-    # yield partially broken lines as chunks to trigger leftover logic
+    """
+    AGENT INSTRUCTION: Ensure batch limit chunking works properly.
+    Yields partially broken lines as chunks to trigger leftover logic.
+    """
     tsv_content = iter(
         [b"evidence_id\tvariant_id\n", b"0\t0\n", b"1\t", b"1\n"] + [f"{i}\t{i}\n".encode() for i in range(2, 1005)]
     )
