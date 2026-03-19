@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: gold_civic_biomarker_associations
+  - name: coreason_etl_civic_gold_civic_biomarker_associations
     description: "Gold layer denormalized view for CIViC biomarker associations"
     columns:
       - name: evidence_id

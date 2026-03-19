@@ -27,7 +27,7 @@ def _fetch_and_process(url: str, entity_type: str, source_id_col: str, source_fi
     yield from process_civic_tsv(chunks, entity_type, source_id_col, source_file=source_file)
 
 
-@dlt.resource(name="civic_genes_raw", write_disposition="replace")
+@dlt.resource(name="coreason_etl_civic_bronze_civic_genes_raw", write_disposition="replace")
 def get_civic_genes() -> Iterator[dict[str, Any]]:
     """AGENT INSTRUCTION: Streams raw genes TSV to standard bronze schema."""
     settings = CivicSettings()
@@ -36,7 +36,7 @@ def get_civic_genes() -> Iterator[dict[str, Any]]:
     yield from _fetch_and_process(url, "genes", "gene_id", source_file=filename)
 
 
-@dlt.resource(name="civic_variants_raw", write_disposition="replace")
+@dlt.resource(name="coreason_etl_civic_bronze_civic_variants_raw", write_disposition="replace")
 def get_civic_variants() -> Iterator[dict[str, Any]]:
     """AGENT INSTRUCTION: Streams raw variants TSV to standard bronze schema."""
     settings = CivicSettings()
@@ -45,7 +45,7 @@ def get_civic_variants() -> Iterator[dict[str, Any]]:
     yield from _fetch_and_process(url, "variants", "variant_id", source_file=filename)
 
 
-@dlt.resource(name="civic_evidence_raw", write_disposition="replace")
+@dlt.resource(name="coreason_etl_civic_bronze_civic_evidence_raw", write_disposition="replace")
 def get_civic_evidence() -> Iterator[dict[str, Any]]:
     """AGENT INSTRUCTION: Streams raw evidence TSV to standard bronze schema."""
     settings = CivicSettings()
