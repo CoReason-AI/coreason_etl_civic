@@ -139,7 +139,7 @@ def test_process_civic_tsv_hypothesis(evidence_ids: list[str], variant_ids: list
         var_id = variant_ids[i]
 
         expected_ev_id = None if ev_id in ("", "N/A") else ev_id
-        expected_coreason_id = str(generate_coreason_id(expected_ev_id))
+        expected_coreason_id = str(generate_coreason_id(str(expected_ev_id)))
         assert res["coreason_id"] == expected_coreason_id
 
         raw_data = res["raw_data"]
