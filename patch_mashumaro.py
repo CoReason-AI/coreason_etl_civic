@@ -1,4 +1,3 @@
-
 target_file = "/app/.venv/lib/python3.14/site-packages/mashumaro/jsonschema/models.py"
 
 with open(target_file) as f:

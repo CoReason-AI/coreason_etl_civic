@@ -94,7 +94,7 @@ def test_process_civic_tsv_empty_batch() -> None:
     assert len(results) == 0
 
 
-@given(
+@given(  # type: ignore[misc]
     evidence_ids=st.lists(
         st.text(
             alphabet=st.characters(exclude_categories=["Cc", "Cs"], exclude_characters=["\t", "\n", "\r", '"', "'"]),
@@ -138,11 +138,12 @@ def test_process_civic_tsv_hypothesis(evidence_ids: list[str], variant_ids: list
         ev_id = evidence_ids[i]
         var_id = variant_ids[i]
 
-        expected_coreason_id = str(generate_coreason_id(ev_id))
+        expected_ev_id = None if ev_id in ("", "N/A") else ev_id
+        expected_coreason_id = str(generate_coreason_id(expected_ev_id))
         assert res["coreason_id"] == expected_coreason_id
 
         raw_data = res["raw_data"]
-        assert raw_data["evidence_id"] == ev_id
+        assert raw_data["evidence_id"] == expected_ev_id
 
         if var_id in ("", "N/A"):
             assert raw_data["variant_id"] is None

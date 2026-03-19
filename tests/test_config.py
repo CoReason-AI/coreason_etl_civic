@@ -44,9 +44,7 @@ def test_civic_settings_env_override() -> None:
     assert settings.civic_target_files == ("test1.tsv", "test2.tsv")
 
 
-
-
-@given(
+@given(  # type: ignore[misc]
     base_url=st.text(alphabet=printable, min_size=1).filter(lambda s: "\x00" not in s),
     target_files=st.lists(st.text(alphabet=printable, min_size=1).filter(lambda s: "\x00" not in s), min_size=1),
 )
