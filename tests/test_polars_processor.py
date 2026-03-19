@@ -9,6 +9,9 @@
 # Source Code: https://github.com/CoReason-AI/coreason_etl_civic
 
 
+from hypothesis import given
+from hypothesis import strategies as st
+
 from coreason_etl_civic.utils.identifiers import generate_coreason_id
 from coreason_etl_civic.utils.polars_processor import process_civic_tsv
 
@@ -89,6 +92,63 @@ def test_process_civic_tsv_empty_batch() -> None:
 
     results = list(process_civic_tsv(tsv_content, entity_type, source_id_col))
     assert len(results) == 0
+
+
+@given(  # type: ignore[misc]
+    evidence_ids=st.lists(
+        st.text(
+            alphabet=st.characters(exclude_categories=["Cc", "Cs"], exclude_characters=["\t", "\n", "\r", '"', "'"]),
+            min_size=1,
+        ),
+        min_size=1,
+        max_size=50,
+    ),
+    variant_ids=st.lists(
+        st.text(
+            alphabet=st.characters(exclude_categories=["Cc", "Cs"], exclude_characters=["\t", "\n", "\r", '"', "'"])
+        ),
+        min_size=1,
+        max_size=50,
+    ),
+)
+def test_process_civic_tsv_hypothesis(evidence_ids: list[str], variant_ids: list[str]) -> None:
+    """AGENT INSTRUCTION: Ensure process_civic_tsv handles randomized and adversarial TSV data structures correctly."""
+    # Create the TSV content
+    header = b"evidence_id\tvariant_id\n"
+    lines = []
+
+    # Pad variants if shorter than evidence ids
+    while len(variant_ids) < len(evidence_ids):
+        variant_ids.append("")
+
+    for i, ev_id in enumerate(evidence_ids):
+        var_id = variant_ids[i]
+        lines.append(f"{ev_id}\t{var_id}\n".encode())
+
+    tsv_content = iter([header, *lines])
+    entity_type = "evidence"
+    source_id_col = "evidence_id"
+
+    results = list(process_civic_tsv(tsv_content, entity_type, source_id_col))
+
+    # verify completeness and logic
+    assert len(results) == len(evidence_ids)
+
+    for i, res in enumerate(results):
+        ev_id = evidence_ids[i]
+        var_id = variant_ids[i]
+
+        expected_ev_id = None if ev_id in ("", "N/A") else ev_id
+        expected_coreason_id = str(generate_coreason_id(str(expected_ev_id)))
+        assert res["coreason_id"] == expected_coreason_id
+
+        raw_data = res["raw_data"]
+        assert raw_data["evidence_id"] == expected_ev_id
+
+        if var_id in ("", "N/A"):
+            assert raw_data["variant_id"] is None
+        else:
+            assert raw_data["variant_id"] == var_id
 
 
 def test_process_civic_tsv_no_newline() -> None:
