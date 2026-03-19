@@ -7,13 +7,15 @@ name = "coreason_etl_civic"
 dynamic = ["version"]
 description = "ETL pipeline for the Clinical Interpretation of Variants in Cancer"
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.12"
 authors = [
     { name = "Akshaya M", email = "akshaya.movvar@coreason.ai" },
 ]
 dependencies = [
+    "dbt-postgres~=1.9.0",
     "dlt>=1.23.0",
     "loguru>=0.7.2",
+    "mashumaro>=3.13,<3.14",
     "polars>=1.39.0",
     "psycopg-binary>=3.3.3",
     "pydantic-settings>=2.13.1",
