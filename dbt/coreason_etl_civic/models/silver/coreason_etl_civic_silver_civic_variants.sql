@@ -7,7 +7,7 @@ WITH raw AS (
         ingestion_ts,
         md5(raw_data::text) AS content_hash,
         ROW_NUMBER() OVER (PARTITION BY (raw_data->>'variant_id')::integer ORDER BY ingestion_ts DESC) AS rn
-    FROM {{ source('bronze', 'civic_variants_raw') }}
+    FROM {{ source('bronze', 'coreason_etl_civic_bronze_civic_variants_raw') }}
 )
 SELECT
     coreason_id::uuid AS coreason_id,

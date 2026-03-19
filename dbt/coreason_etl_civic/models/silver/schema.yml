@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: silver_civic_genes
+  - name: coreason_etl_civic_silver_civic_genes
     description: "Silver layer for CIViC Genes"
     columns:
       - name: coreason_id
@@ -15,7 +15,7 @@ models:
           - unique
           - not_null
 
-  - name: silver_civic_variants
+  - name: coreason_etl_civic_silver_civic_variants
     description: "Silver layer for CIViC Variants"
     columns:
       - name: coreason_id
@@ -33,10 +33,10 @@ models:
         tests:
           - not_null
           - relationships:
-              to: ref('silver_civic_genes')
+              to: ref('coreason_etl_civic_silver_civic_genes')
               field: gene_id
 
-  - name: silver_civic_evidence
+  - name: coreason_etl_civic_silver_civic_evidence
     description: "Silver layer for CIViC Evidence"
     columns:
       - name: coreason_id
@@ -54,5 +54,5 @@ models:
         tests:
           - not_null
           - relationships:
-              to: ref('silver_civic_variants')
+              to: ref('coreason_etl_civic_silver_civic_variants')
               field: variant_id
