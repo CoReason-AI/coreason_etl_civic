@@ -12,7 +12,7 @@ authors = [
     { name = "Akshaya M", email = "akshaya.movvar@coreason.ai" },
 ]
 dependencies = [
-    "dbt-postgres~=1.9.0",
+    "dbt-postgres>=1.9.0",
     "dlt>=1.23.0",
     "loguru>=0.7.2",
     "mashumaro>=3.13,<3.14",
