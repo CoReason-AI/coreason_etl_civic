@@ -5,6 +5,7 @@ config-version: 2
 profile: 'coreason_etl_civic'
 
 model-paths: ["models"]
+macro-paths: ["macros"]
 target-path: "target"
 clean-targets:
   - "target"
