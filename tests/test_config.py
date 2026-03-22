@@ -15,6 +15,7 @@ from unittest import mock
 
 from hypothesis import given
 from hypothesis import strategies as st
+from hypothesis.provisional import urls
 
 from coreason_etl_civic.config import CivicSettings
 
@@ -50,6 +51,24 @@ def test_civic_settings_env_override() -> None:
 )
 def test_civic_settings_hypothesis(base_url: str, target_files: list[str]) -> None:
     """AGENT INSTRUCTION: Ensure CivicSettings accepts arbitrary strings for dynamic configuration."""
+    with mock.patch.dict(
+        os.environ,
+        {
+            "CIVIC_CIVIC_NIGHTLY_BASE_URL": base_url,
+            "CIVIC_CIVIC_TARGET_FILES": json.dumps(target_files),
+        },
+    ):
+        settings = CivicSettings()
+        assert settings.civic_nightly_base_url == base_url
+        assert settings.civic_target_files == tuple(target_files)
+
+
+@given(  # type: ignore[misc]
+    base_url=urls(),
+    target_files=st.lists(st.text(alphabet=printable, min_size=1).filter(lambda s: "\x00" not in s), min_size=1),
+)
+def test_civic_settings_hypothesis_urls(base_url: str, target_files: list[str]) -> None:
+    """AGENT INSTRUCTION: Ensure CivicSettings accepts valid URLs for dynamic configuration."""
     with mock.patch.dict(
         os.environ,
         {
