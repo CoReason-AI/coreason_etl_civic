@@ -34,7 +34,7 @@ def _fetch_and_process(file_index: int, entity_type: str, source_id_col: str) ->
 @dlt.resource(name="coreason_etl_civic_bronze_civic_genes_raw", write_disposition="replace")
 def get_civic_genes() -> Iterator[dict[str, Any]]:
     """AGENT INSTRUCTION: Streams raw genes TSV to standard bronze schema."""
-    yield from _fetch_and_process(0, "genes", "gene_id")
+    yield from _fetch_and_process(0, "genes", "feature_id")
 
 
 @dlt.resource(name="coreason_etl_civic_bronze_civic_variants_raw", write_disposition="replace")

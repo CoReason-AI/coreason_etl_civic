@@ -49,7 +49,7 @@ def process_civic_tsv(
         if not batch_bytes.strip():
             return
 
-        df = pl.read_csv(batch_bytes, separator="\t", infer_schema_length=0, null_values=["", "N/A"])
+        df = pl.read_csv(batch_bytes, separator="\t", infer_schema_length=0, null_values=["", "N/A"], truncate_ragged_lines=True)
 
         df = df.with_columns(
             pl.col(source_id_col)

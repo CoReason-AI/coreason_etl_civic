@@ -13,7 +13,7 @@ SELECT
     coreason_id::uuid AS coreason_id,
     content_hash,
     (raw_data->>'evidence_id')::integer AS evidence_id,
-    (raw_data->>'variant_id')::integer AS variant_id,
+    (COALESCE(raw_data->>'variant_id', raw_data->>'molecular_profile_id'))::integer AS variant_id,
     NULLIF(TRIM(raw_data->>'disease'), '') AS disease_name,
     string_to_array(NULLIF(TRIM(raw_data->>'drugs'), ''), ', ') AS drug_names,
     NULLIF(TRIM(raw_data->>'evidence_type'), '') AS evidence_type,

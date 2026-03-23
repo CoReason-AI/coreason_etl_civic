@@ -2,7 +2,7 @@ name: 'coreason_etl_civic'
 version: '1.0.0'
 config-version: 2
 
-profile: 'coreason_etl_civic'
+profile: 'postgres'
 
 model-paths: ["models"]
 macro-paths: ["macros"]
