@@ -66,17 +66,25 @@ def test_get_civic_evidence_resource(mock_process: mock.MagicMock, mock_fetch: m
     )
 
 
+@mock.patch("coreason_etl_civic.dlt_resources.CivicSettings")
 @mock.patch("coreason_etl_civic.dlt_resources.fetch_civic_tsv")
 @mock.patch("coreason_etl_civic.dlt_resources.process_civic_tsv")
-def test_fetch_and_process_integration(mock_process: mock.MagicMock, mock_fetch: mock.MagicMock) -> None:
+def test_fetch_and_process_integration(
+    mock_process: mock.MagicMock, mock_fetch: mock.MagicMock, mock_settings: mock.MagicMock
+) -> None:
     """AGENT INSTRUCTION: Test the helper function buffering logic."""
+    mock_settings_instance = mock.MagicMock()
+    mock_settings.return_value = mock_settings_instance
+    mock_settings_instance.civic_target_files = ["nightly-GeneSummaries.tsv", "test.tsv", "test2.tsv"]
+    mock_settings_instance.civic_nightly_base_url = "http://fake.url/"
+
     mock_fetch.return_value = iter([b"gene_id\tname\n", b"1\tBRAF"])
     mock_process.return_value = [{"coreason_id": "uuid", "raw_data": {"gene_id": "1", "name": "BRAF"}}]
 
-    results = list(_fetch_and_process("http://fake.url", "genes", "gene_id", "nightly-GeneSummaries.tsv"))
+    results = list(_fetch_and_process(0, "genes", "gene_id"))
 
     assert len(results) == 1
-    mock_fetch.assert_called_once_with("http://fake.url")
+    mock_fetch.assert_called_once_with("http://fake.url/nightly-GeneSummaries.tsv")
     mock_process.assert_called_once_with(
         mock_fetch.return_value, "genes", "gene_id", source_file="nightly-GeneSummaries.tsv"
     )

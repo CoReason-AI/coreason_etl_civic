@@ -8,7 +8,11 @@
 #
 # Source Code: https://github.com/CoReason-AI/coreason_etl_civic
 
+from typing import cast
+
 import dlt
+from dlt.common.destination.client import DestinationClientDwhConfiguration
+from dlt.common.runners import Venv
 from dlt.helpers.dbt.runner import create_runner
 
 from coreason_etl_civic.dlt_resources import (
@@ -55,10 +59,6 @@ def run_pipeline() -> None:
     logger.info("CIViC DLT Pipeline Completed", load_info=str(load_info))
 
     logger.info("Starting dbt transformations")
-    from typing import cast
-
-    from dlt.common.destination.client import DestinationClientDwhConfiguration
-    from dlt.common.runners import Venv
 
     venv = Venv.restore_current()
     client_config = cast("DestinationClientDwhConfiguration", pipeline.destination_client().config)

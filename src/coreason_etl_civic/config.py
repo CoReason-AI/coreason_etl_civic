@@ -8,7 +8,7 @@
 #
 # Source Code: https://github.com/CoReason-AI/coreason_etl_civic
 
-from pydantic import Field
+from pydantic import AnyHttpUrl, Field, TypeAdapter
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -17,8 +17,8 @@ class CivicSettings(BaseSettings):
     AGENT INSTRUCTION: This class encapsulates configuration for the coreason_etl_civic pipeline.
     """
 
-    civic_nightly_base_url: str = Field(
-        default="https://civicdb.org/downloads/nightly/",
+    civic_nightly_base_url: AnyHttpUrl = Field(
+        default=TypeAdapter(AnyHttpUrl).validate_python("https://civicdb.org/downloads/nightly/"),
         description="The base URL for the CIViC Nightly Data Releases.",
     )
     civic_target_files: tuple[str, ...] = Field(
@@ -28,6 +28,7 @@ class CivicSettings(BaseSettings):
             "nightly-ClinicalEvidenceSummaries.tsv",
         ),
         description="The target CIViC TSV files to ingest in the Bronze layer.",
+        min_length=1,
     )
 
     model_config = SettingsConfigDict(env_prefix="CIVIC_", env_file=".env", extra="ignore")
