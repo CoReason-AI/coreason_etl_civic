@@ -8,9 +8,13 @@
 #
 # Source Code: https://github.com/CoReason-AI/coreason_etl_civic
 
-from coreason_etl_civic.utils.logger import logger
+from coreason_etl_civic.pipeline import run_pipeline
 
 
-def hello_world() -> str:
-    logger.info("Hello World!")
-    return "Hello World!"
+def main() -> None:
+    """AGENT INSTRUCTION: Main entrypoint to trigger the ETL pipeline."""
+    run_pipeline()
+
+
+if __name__ == "__main__":  # pragma: no cover
+    main()

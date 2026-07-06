@@ -1,0 +1,38 @@
+version: 2
+
+models:
+  - name: coreason_etl_civic_gold_civic_biomarker_associations
+    description: "Gold layer denormalized view for CIViC biomarker associations"
+    columns:
+      - name: evidence_id
+        description: "Original Source ID for the Evidence Item"
+        tests:
+          - unique
+          - not_null
+      - name: gene_symbol
+        description: "Gene Symbol"
+        tests:
+          - not_null
+      - name: variant_name
+        description: "Variant Name"
+        tests:
+          - not_null
+      - name: disease_name
+        description: "Disease Name"
+      - name: drug_names
+        description: "List of Drug Names"
+      - name: clinical_significance
+        description: "Clinical Significance of the Evidence"
+      - name: evidence_type
+        description: "Type of Evidence (e.g., Predictive, Diagnostic)"
+      - name: evidence_level
+        description: "Level of Evidence (e.g., A, B, C)"
+      - name: evidence_rating
+        description: "1-5 star rating"
+      - name: pubmed_id
+        description: "Cross-reference to PubMed"
+      - name: evidence_hash
+        description: "MD5 Hash of the original JSON raw_data for the evidence"
+        tests:
+          - unique
+          - not_null

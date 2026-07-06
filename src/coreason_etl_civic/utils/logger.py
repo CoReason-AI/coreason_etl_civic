@@ -15,10 +15,10 @@ from loguru import logger
 
 __all__ = ["logger"]
 
-# Remove default handler
+"""Remove default handler"""
 logger.remove()
 
-# Sink 1: Stdout (Human-readable)
+"""Sink 1: Stdout (Human-readable)"""
 logger.add(
     sys.stderr,
     level="INFO",
@@ -30,12 +30,12 @@ logger.add(
     ),
 )
 
-# Ensure logs directory exists
+"""Ensure logs directory exists"""
 log_path = Path("logs")
-if not log_path.exists():
+if not log_path.exists():  # pragma: no cover
     log_path.mkdir(parents=True, exist_ok=True)
 
-# Sink 2: File (JSON, Rotation, Retention)
+"""Sink 2: File (JSON, Rotation, Retention)"""
 logger.add(
     "logs/app.log",
     rotation="500 MB",
